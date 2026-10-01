@@ -1,0 +1,19 @@
+Coolvetica — font license notice
+=================================
+
+Font:       Coolvetica (Regular, Heavy Compressed)
+Files:      Coolvetica-Rg.otf, Coolvetica-Hv-Comp.otf
+Copyright:  (c) 1999-2024 Typodermic Fonts Inc.   [as embedded in the font file]
+Designer:   Ray Larabie
+Source:     https://typodermicfonts.com
+
+Coolvetica is distributed by Typodermic Fonts Inc. free for personal and commercial use.
+It is bundled here so the "Butter" style pack renders on any machine.
+
+Full license terms: the authoritative, current license is published by Typodermic at the source
+URL above. This notice records the font's own embedded copyright; the complete Typodermic license
+text is NOT reproduced here.
+
+BEFORE PUBLIC SALE: download Typodermic's current license from the source and confirm it permits
+bundling the font file inside a sold product (most Typodermic fonts allow this, but verify the
+redistribution clause). Place the downloaded license text alongside this notice.
