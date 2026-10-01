@@ -1,0 +1,26 @@
+# Modified by Homewell LLC, 2026, for The Reels Editing Engine. Original: VectCutAPI
+# (https://github.com/sun-guannan/VectCutAPI), Apache License 2.0; see LICENSE in this folder.
+imageio
+psutil
+flask
+requests
+oss2
+json5
+
+# Intel-Mac wheel pin. MEASURED from PyPI, not guessed.
+#
+# oss2 -> aliyun-python-sdk-core -> cryptography (>=3.0.0, otherwise unpinned). cryptography 49.0.0
+# publishes macOS wheels for arm64 ONLY -- it dropped the macosx_10_9_universal2 wheel that 48.x and
+# every earlier release shipped. So on an Intel Mac pip finds no usable wheel, falls back to the
+# sdist, and tries to COMPILE cryptography, which needs a Rust toolchain and Apple's Command Line
+# Tools. On the machine this route exists for, neither is installed, so setup dies partway through
+# installing the engine's tools.
+#
+#   cryptography 49.0.0  macosx_11_0_arm64 only          <- no Intel wheel
+#   cryptography 48.0.x  macosx_10_9_universal2          <- installs on Intel, no compiler needed
+#
+# The marker keeps this OFF Apple Silicon and Windows, which stay on current cryptography. It also
+# correctly covers an Apple Silicon Mac running a Rosetta'd terminal, whose Python reports x86_64 and
+# hits the identical wall. aliyun-python-sdk-core only asks for >=3.0.0, so 48.x satisfies the chain.
+# Re-test when cryptography publishes a universal2 or x86_64 macOS wheel again, then drop this line.
+cryptography<49; sys_platform == "darwin" and platform_machine == "x86_64"
