@@ -1,0 +1,861 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light dark">
+</head>
+<body>
+<title>Effects Library</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
+<style>
+  :root{
+    --bg:#F8F6EE; --surface:#FFFFFF; --surface-2:#FFFDF6;
+    --text:#1E1E1E; --muted:#4D3B2D; --border:#E7E3D9;
+    --accent:#BD1B1B;
+    --c-text:#BD1B1B; --c-cap:#9C7C4D; --c-footage:#395848; --c-trans:#B0741A; --c-card:#8C3B57; --c-grade:#5B6B73; --c-sound:#2F6D8C; --c-cover:#B24A3B;
+    --shadow:0 1px 2px rgba(30,30,30,.05), 0 10px 26px rgba(30,30,30,.06);
+    --stage:#F3EFE2; --line:rgba(30,30,30,.08); --pill:rgba(30,30,30,.05);
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#1B1815; --surface:#242019; --surface-2:#2B261E;
+      --text:#F3ECDD; --muted:#B8AC96; --border:rgba(243,236,221,.14);
+      --accent:#E5484D;
+      --c-text:#E5484D; --c-cap:#D9B877; --c-footage:#9FC4AD; --c-trans:#E8B563; --c-card:#E695AE; --c-grade:#9FB3BD; --c-sound:#86C3E0; --c-cover:#EFA085;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 12px 32px rgba(0,0,0,.35);
+      --stage:#15120F; --line:rgba(243,236,221,.07); --pill:rgba(243,236,221,.07);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#1B1815; --surface:#242019; --surface-2:#2B261E;
+    --text:#F3ECDD; --muted:#B8AC96; --border:rgba(243,236,221,.14);
+    --accent:#E5484D;
+    --c-text:#E5484D; --c-cap:#D9B877; --c-footage:#9FC4AD; --c-trans:#E8B563; --c-card:#E695AE; --c-grade:#9FB3BD; --c-sound:#86C3E0; --c-cover:#EFA085;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 12px 32px rgba(0,0,0,.35);
+    --stage:#15120F; --line:rgba(243,236,221,.07); --pill:rgba(243,236,221,.07);
+  }
+  *{box-sizing:border-box}
+  body{background:var(--bg); color:var(--text); font-family:"Hanken Grotesk",system-ui,sans-serif; line-height:1.5; -webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1180px; margin:0 auto; padding:38px 22px 80px}
+
+  header.mast{display:flex; flex-wrap:wrap; gap:18px 32px; align-items:flex-end; justify-content:space-between; padding-bottom:20px}
+  .eyebrow{font-family:"JetBrains Mono",monospace; font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); margin:0 0 10px}
+  h1{font-family:"Bricolage Grotesque",sans-serif; font-weight:800; font-size:clamp(2rem,4.5vw,3rem); line-height:1.02; letter-spacing:-.02em; margin:0 0 10px; text-wrap:balance}
+  .sub{color:var(--muted); font-size:1.02rem; margin:0; max-width:62ch}
+  .sub b{color:var(--text); font-weight:600}
+  .controls{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+  .search{display:flex; align-items:center; gap:8px; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:9px 13px; min-width:200px}
+  .search input{border:0; background:transparent; color:var(--text); font:inherit; font-size:.92rem; outline:none; width:100%}
+  .search svg{flex:none; opacity:.5}
+  button{font-family:inherit; cursor:pointer; border:1px solid var(--border); background:var(--surface); color:var(--text); border-radius:10px; padding:9px 14px; font-size:.9rem; font-weight:600; transition:border-color .15s, transform .08s, background .15s}
+  button:hover{border-color:var(--accent)} button:active{transform:translateY(1px)}
+  button:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+  .btn-primary{background:var(--accent); border-color:var(--accent); color:#fff}
+
+  /* top-level tabs — styled as an obvious segmented control so they read as tappable */
+  .tabs-label{font-family:"JetBrains Mono",monospace; font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin:0 0 9px}
+  .tabbar{display:flex; gap:8px; margin:0 0 18px; overflow-x:auto; padding:5px 1px 9px}
+  .tab{border:1px solid var(--border); background:var(--surface); border-radius:12px; color:var(--muted); font-size:1rem; font-weight:700; padding:10px 18px; white-space:nowrap; font-family:"Bricolage Grotesque",sans-serif; letter-spacing:-.01em; box-shadow:var(--shadow); cursor:pointer; transition:border-color .15s, background .15s, color .15s, transform .08s}
+  .tab:hover{color:var(--text); border-color:var(--accent); transform:translateY(-1px)}
+  .tab[aria-selected="true"]{color:#fff; background:var(--accent); border-color:var(--accent)}
+  .tab[aria-selected="true"] .t-sub{color:rgba(255,255,255,.82)}
+  .tab .t-sub{display:block; font-family:"Hanken Grotesk"; font-weight:500; font-size:.72rem; color:var(--muted); letter-spacing:0; margin-top:1px}
+  .panel[hidden]{display:none}
+  .panel-head{display:flex; flex-wrap:wrap; gap:10px 16px; align-items:center; justify-content:space-between; margin-bottom:14px}
+
+  .filters{display:flex; flex-wrap:wrap; gap:8px; margin:0 0 6px}
+  .chip{font-family:"JetBrains Mono",monospace; font-size:12px; padding:7px 13px; border-radius:999px; border:1px solid var(--border); background:var(--surface); color:var(--muted)}
+  .chip[aria-pressed="true"]{color:var(--text); border-color:var(--accent); background:color-mix(in srgb,var(--accent) 12%,transparent)}
+  .chip .dot{display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:7px; vertical-align:middle; background:var(--d,var(--accent))}
+
+  section{margin-top:30px}
+  section:first-child{margin-top:6px}
+  section[hidden]{display:none}
+  .sec-head{display:flex; align-items:baseline; gap:12px; margin-bottom:14px}
+  .sec-head h2{font-family:"Bricolage Grotesque",sans-serif; font-weight:700; font-size:1.28rem; letter-spacing:-.01em; margin:0}
+  .sec-head .count{font-family:"JetBrains Mono",monospace; font-size:12px; color:var(--muted)}
+  .sec-head .note{color:var(--muted); font-size:.9rem; margin-left:auto; text-align:right; max-width:52ch}
+
+  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(256px,1fr)); gap:16px}
+  .card{background:var(--surface); border:1px solid var(--border); border-radius:14px; overflow:hidden; box-shadow:var(--shadow); display:flex; flex-direction:column; transition:border-color .15s, transform .15s}
+  .card[hidden]{display:none}
+  .card:hover{border-color:color-mix(in srgb,var(--accent) 45%,var(--border)); transform:translateY(-2px)}
+  .stage{position:relative; height:132px; display:flex; align-items:center; justify-content:center; text-align:center; padding:12px 16px; overflow:hidden; background:var(--stage); border-bottom:1px solid var(--border); perspective:800px; cursor:pointer}
+  .stage-text{font-family:"Bricolage Grotesque",sans-serif; font-weight:700; font-size:clamp(1.25rem,2.4vw,1.6rem); letter-spacing:-.01em; line-height:1.12; transform-style:preserve-3d; color:var(--text)}
+  .stage-text .u{display:inline-block; will-change:transform,opacity,filter}
+  .stage-text .mask{display:inline-block; overflow:hidden; vertical-align:top}
+  .stage-text .line{display:block; overflow:hidden}
+  .stage-text .inner{display:inline-block}
+  .caret{display:inline-block; width:.06em; height:1em; background:var(--accent); margin-left:.04em; vertical-align:-.12em; opacity:0}
+  .scene{position:absolute; inset:0; overflow:hidden}
+  .scene svg{position:absolute; inset:0; width:100%; height:100%; display:block}
+  .panelfx{position:absolute; inset:0; overflow:hidden}
+  .grade-tag{position:absolute; left:10px; bottom:9px; z-index:3; font-family:"JetBrains Mono",monospace; font-size:11px; font-weight:600; color:#fff; background:rgba(0,0,0,.5); padding:3px 8px; border-radius:6px; letter-spacing:.02em}
+  .fx-num{font-family:"Bricolage Grotesque",sans-serif; font-weight:800; font-size:2.6rem; color:var(--text); line-height:1; font-variant-numeric:tabular-nums}
+  .fx-lab{font-family:"Hanken Grotesk"; font-size:.8rem; color:var(--muted); margin-top:4px}
+  .split{position:absolute; inset:0; display:flex}
+  .split > div{flex:1; display:flex; align-items:center; justify-content:center; font-family:"Bricolage Grotesque"; font-weight:700; font-size:1.4rem; color:#fff}
+  .rk{display:flex; flex-direction:column; gap:7px; width:78%}
+  .rk .row{display:flex; align-items:center; gap:8px; background:var(--surface-2); border-radius:7px; padding:6px 10px; font-size:.82rem; font-weight:600}
+  .rk .row .n{font-family:"JetBrains Mono"; color:var(--accent); font-size:.75rem}
+  .rk .row .ck{margin-left:auto; color:var(--c-footage); font-weight:800}
+  .titlecard{text-align:center}
+  .titlecard .t{font-family:"Bricolage Grotesque"; font-weight:800; font-size:1.5rem; letter-spacing:-.01em}
+  .titlecard .r{height:4px; width:60px; background:var(--accent); border-radius:3px; margin:9px auto 0}
+  .ticker{white-space:nowrap; font-family:"Bricolage Grotesque"; font-weight:800; font-size:1.5rem; color:var(--text)}
+  .note-ic{font-size:2rem; line-height:1}
+  /* caption styles */
+  .cap-line{font-family:"Hanken Grotesk",sans-serif; font-weight:800; font-size:1.35rem; line-height:1.25; text-align:center; color:var(--text); padding:0 8px}
+  .cap-line .w{display:inline-block}
+  .cap-kw{background:var(--c-trans); color:#fff; border-radius:6px; padding:1px 7px}
+  .cap-bottom{position:absolute; left:0; right:0; bottom:14px; padding:0 16px}
+  .cap-take{font-family:"Bricolage Grotesque",sans-serif; font-weight:800; font-size:clamp(1.9rem,5.5vw,2.9rem); letter-spacing:-.02em; color:var(--text); text-transform:uppercase; line-height:.98; text-align:center}
+  .cap-cl{display:block}
+  .meta{padding:12px 14px 14px; display:flex; flex-direction:column; gap:7px; flex:1}
+  .name-row{display:flex; align-items:center; gap:8px; justify-content:space-between}
+  .eff-name{font-family:"JetBrains Mono",monospace; font-weight:600; font-size:.85rem; color:var(--text); cursor:copy; border:0; background:transparent; padding:0; text-align:left}
+  .eff-name:hover{color:var(--accent)}
+  .eff-name::after{content:" ⧉"; opacity:.4; font-size:.8em}
+  .scope-dot{width:9px; height:9px; border-radius:50%; flex:none}
+  .desc{color:var(--muted); font-size:.85rem; margin:0}
+  .tags{display:flex; flex-wrap:wrap; gap:5px; margin-top:1px}
+  .tag{font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:.02em; color:var(--muted); background:var(--pill); border-radius:5px; padding:2px 7px}
+  .replay{align-self:flex-start; margin-top:3px; font-size:.76rem; padding:6px 11px; color:var(--muted); border-radius:8px}
+  .replay:hover{color:var(--text)}
+
+  /* commands */
+  .cmd-group{margin-top:28px}
+  .cmd-group:first-child{margin-top:4px}
+  .cmd-group h2{font-family:"Bricolage Grotesque"; font-weight:700; font-size:1.2rem; letter-spacing:-.01em; margin:0 0 3px}
+  .cmd-group p.gs{color:var(--muted); font-size:.9rem; margin:0 0 14px}
+  .cmd-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:12px}
+  .cmd{background:var(--surface); border:1px solid var(--border); border-radius:12px; box-shadow:var(--shadow); padding:14px 15px; display:flex; flex-direction:column; gap:5px; cursor:copy; transition:border-color .15s, transform .12s}
+  .cmd:hover{border-color:color-mix(in srgb,var(--accent) 45%,var(--border)); transform:translateY(-2px)}
+  .cmd[hidden]{display:none}
+  .cmd .phrase{font-family:"Bricolage Grotesque"; font-weight:700; font-size:1.05rem; letter-spacing:-.01em; color:var(--text)}
+  .cmd .phrase::before{content:"\201C"} .cmd .phrase::after{content:"\201D  ⧉"; opacity:.75}
+  .cmd .what{color:var(--muted); font-size:.86rem}
+
+  /* studio */
+  .studio-intro{background:var(--surface); border:1px solid var(--border); border-left:3px solid var(--accent); border-radius:14px; box-shadow:var(--shadow); padding:16px 18px; margin:4px 0 4px}
+  .studio-intro h2{font-family:"Bricolage Grotesque"; font-weight:800; font-size:1.2rem; letter-spacing:-.01em; margin:0 0 4px}
+  .studio-intro p{color:var(--muted); font-size:.92rem; margin:0 0 10px; max-width:70ch}
+  .studio-intro ul{margin:0; padding-left:18px; display:flex; flex-direction:column; gap:6px; font-size:.9rem}
+  .kbd{font-family:"JetBrains Mono",monospace; font-size:.8rem; background:var(--pill); border:1px solid var(--border); border-radius:6px; padding:1px 7px; color:var(--text); white-space:nowrap}
+  .cmd.slash .phrase{font-family:"JetBrains Mono",monospace; font-weight:600; font-size:.97rem; letter-spacing:0}
+  .cmd.slash .phrase::before{content:none} .cmd.slash .phrase::after{content:"  \29C9"; opacity:.6}
+  .cmd .get{color:var(--text); font-size:.84rem; border-top:1px solid var(--line); padding-top:7px; margin-top:3px}
+  .cmd .get b{font-family:"JetBrains Mono",monospace; font-weight:600; font-size:.68rem; letter-spacing:.08em; text-transform:uppercase; color:var(--accent); margin-right:6px}
+  .studio-note{color:var(--muted); font-size:.88rem; margin:26px 0 0; max-width:78ch}
+  .studio-note b{color:var(--text); font-weight:600}
+
+  /* concepts */
+  .concept-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:16px}
+  .concept{background:var(--surface); border:1px solid var(--border); border-radius:14px; box-shadow:var(--shadow); padding:18px 19px; border-top:3px solid var(--accent)}
+  .concept[hidden]{display:none}
+  .concept h3{font-family:"Bricolage Grotesque"; font-weight:800; font-size:1.15rem; letter-spacing:-.01em; margin:0 0 4px}
+  .concept .lede{color:var(--muted); font-size:.9rem; margin:0 0 11px}
+  .concept ul{margin:0; padding-left:18px; display:flex; flex-direction:column; gap:6px}
+  .concept li{font-size:.9rem}
+  .concept li b{font-weight:700}
+
+  .toast{position:fixed; left:50%; bottom:26px; transform:translateX(-50%) translateY(20px); background:var(--text); color:var(--bg); font-size:.85rem; font-weight:600; padding:10px 18px; border-radius:10px; opacity:0; pointer-events:none; transition:opacity .2s, transform .2s; z-index:50; font-family:"JetBrains Mono",monospace}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+  .empty{color:var(--muted); padding:30px 0; text-align:center}
+  footer{margin-top:52px; padding-top:22px; border-top:1px solid var(--border); color:var(--muted); font-size:.85rem; display:flex; flex-direction:column; gap:8px}
+  footer b{color:var(--text); font-weight:600}
+  @media (max-width:560px){ .wrap{padding:26px 15px 56px} .sec-head{flex-wrap:wrap} .sec-head .note{margin-left:0; text-align:left; width:100%} }
+
+  /* ============ Sounds tab ============ */
+  :root{ --mood-playful:#C9541F; --mood-triumphant:#A87012; --mood-tender:#A4466A; --mood-tense:#9B2C24; --mood-somber:#4B5170; --mood-neutral:#7D7466; }
+  @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){ --mood-playful:#F08A5D; --mood-triumphant:#E8B563; --mood-tender:#E695AE; --mood-tense:#F07C70; --mood-somber:#A9B0D6; --mood-neutral:#C9BFAE; } }
+  :root[data-theme="dark"]{ --mood-playful:#F08A5D; --mood-triumphant:#E8B563; --mood-tender:#E695AE; --mood-tense:#F07C70; --mood-somber:#A9B0D6; --mood-neutral:#C9BFAE; }
+  .snd-intro{margin:4px 0 14px}
+  .snd-intro h2{font-family:"Bricolage Grotesque",sans-serif; font-weight:800; font-size:clamp(1.4rem,2.6vw,1.8rem); letter-spacing:-.02em; line-height:1.1; margin:0 0 6px; text-wrap:balance}
+  .snd-intro p{color:var(--muted); margin:0; max-width:68ch}
+  .snd-bar{position:sticky; top:0; z-index:5; background:var(--bg); padding:12px 0 10px; margin:0 0 4px; border-bottom:1px solid var(--line); display:grid; gap:10px}
+  .snd-frow{display:grid; grid-template-columns:150px 1fr; gap:6px 14px; align-items:center}
+  .snd-flabel{font-weight:700; font-size:.88rem}
+  .snd-chips{display:flex; flex-wrap:wrap; gap:6px}
+  .snd-chip{font-family:"Hanken Grotesk",sans-serif; font-size:.86rem; font-weight:600; padding:7px 12px; display:inline-flex; align-items:center}
+  .snd-chip .n{margin-left:7px; font-family:"JetBrains Mono",monospace; font-size:11px; color:var(--muted); font-variant-numeric:tabular-nums}
+  .snd-chip:disabled{opacity:.4; cursor:default; border-color:var(--border)}
+  .snd-chip .dot{width:9px; height:9px}
+  .snd-status{display:flex; align-items:center; gap:12px; font-size:.86rem; color:var(--muted)}
+  .snd-clear{padding:4px 10px; font-size:.82rem; border-radius:8px}
+  .snd-callout{margin:14px 0 0; padding:10px 14px; border-radius:10px; background:color-mix(in srgb,var(--c-sound) 9%,var(--surface)); border:1px solid color-mix(in srgb,var(--c-sound) 30%,var(--border)); font-size:.92rem}
+  .snd-callout[hidden]{display:none}
+  .snd-group{margin-top:28px}
+  .snd-ghead{display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 12px; margin:0 0 10px}
+  .snd-ghead h3{font-family:"Bricolage Grotesque",sans-serif; font-weight:700; font-size:1.18rem; letter-spacing:-.01em; margin:0}
+  .snd-ghead p{margin:0; color:var(--muted); font-size:.9rem}
+  .snd-ghead .n{margin-left:auto; font-family:"JetBrains Mono",monospace; font-size:12px; color:var(--muted)}
+  .snd-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(310px,1fr)); gap:8px}
+  .snd-row{position:relative; overflow:hidden; display:grid; grid-template-columns:44px minmax(0,1fr) auto; align-items:center; gap:12px; padding:9px 10px; background:var(--surface); border:1px solid var(--border); border-radius:12px; transition:border-color .15s}
+  .snd-row:hover{border-color:color-mix(in srgb,var(--c-sound) 45%,var(--border))}
+  .snd-row.is-playing{border-color:var(--c-sound)}
+  .snd-row::after{content:""; position:absolute; left:0; bottom:0; height:3px; width:calc(var(--p,0) * 100%); background:var(--c-sound)}
+  .snd-play{width:44px; height:44px; padding:0; border-radius:50%; border:0; display:grid; place-items:center; background:color-mix(in srgb,var(--c-sound) 14%,transparent); color:var(--c-sound); transition:background .15s, color .15s}
+  .snd-play:hover{background:color-mix(in srgb,var(--c-sound) 24%,transparent)}
+  .snd-play[aria-pressed="true"]{background:var(--c-sound); color:var(--surface)}
+  .snd-play[aria-pressed="false"] svg{transform:translateX(1px)}
+  .snd-text{min-width:0}
+  .snd-title{font-weight:600; font-size:.95rem; line-height:1.3; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .snd-meta{display:flex; align-items:center; gap:6px; color:var(--muted); font-size:.8rem; margin-top:1px}
+  .snd-meta .dot,.snd-chip .dot{display:inline-block; border-radius:50%; background:var(--d); flex:none}
+  .snd-meta .dot{width:7px; height:7px}
+  .snd-chip .dot{margin-right:7px}
+  .snd-copy{display:inline-flex; align-items:center; gap:6px; max-width:150px; padding:6px 9px; border-radius:8px; font-family:"JetBrains Mono",monospace; font-size:12px; font-weight:500; color:var(--muted); background:var(--pill); border-color:transparent}
+  .snd-copy:hover{color:var(--text); border-color:var(--border)}
+  .snd-copy span{overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .snd-copy svg{flex:none}
+  .snd-own{color:var(--muted); font-size:.92rem; margin:34px 0 0; max-width:70ch}
+  .snd-jump{display:flex; width:100%; align-items:center; justify-content:space-between; gap:12px; margin-top:14px; padding:15px 18px; border-radius:12px; font-family:"Bricolage Grotesque",sans-serif; font-weight:700; font-size:1.05rem; color:var(--text); background:color-mix(in srgb,var(--c-sound) 8%,var(--surface)); border:1px solid color-mix(in srgb,var(--c-sound) 35%,var(--border))}
+  .snd-jump:hover{border-color:var(--c-sound)}
+  .snd-jump-l{display:inline-flex; align-items:center; gap:10px; color:var(--c-sound)}
+  .snd-jump-l span{color:inherit}
+  #empty-sounds .snd-clear{margin-left:8px}
+  @media (max-width:640px){
+    .snd-frow{grid-template-columns:1fr}
+    .snd-chips{flex-wrap:nowrap; overflow-x:auto; margin:0 -16px; padding:2px 16px 4px; scrollbar-width:none}
+    .snd-chips::-webkit-scrollbar{display:none}
+    .snd-chip{flex:none}
+    .snd-grid{grid-template-columns:1fr}
+    .snd-row{grid-template-columns:44px minmax(0,1fr); row-gap:6px}
+    .snd-copy{grid-column:2; justify-self:start; max-width:100%}
+    .snd-bar{top:0}
+  }
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <div>
+      <p class="eyebrow">the reels editing engine</p>
+      <h1>Effects Library</h1>
+      <p class="sub">Your one place for <b>what it can do</b>, <b>what to say</b>, <b>how to fine-tune it</b>, and <b>how it works</b>. Tap any effect or command to copy it, then ask for it by name.</p>
+    </div>
+    <div class="controls">
+      <label class="search"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><input id="search" type="search" placeholder="Search" aria-label="Search"></label>
+      <button id="themeToggle" aria-label="Toggle theme" title="Toggle theme">◐</button>
+    </div>
+  </header>
+
+  <p class="tabs-label">Five ways in &middot; tap to switch</p>
+  <div class="tabbar" role="tablist">
+    <button class="tab" role="tab" aria-selected="true" data-tab="effects">Effects<span class="t-sub">what it can do</span></button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="commands">Commands<span class="t-sub">what to say</span></button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="studio">Studio<span class="t-sub">fine-tune the look</span></button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="sounds">Sounds<span class="t-sub">hear every one</span></button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="concepts">How it works<span class="t-sub">the cheat cards</span></button>
+  </div>
+
+  <div class="panel" id="panel-effects" role="tabpanel">
+    <div class="panel-head">
+      <div class="filters" id="filters" role="group" aria-label="Filter by category"></div>
+      <button class="btn-primary" id="playAll">Play all</button>
+    </div>
+    <main id="cats"></main>
+    <p class="empty" id="empty-effects" hidden>No effects match that search.</p>
+  </div>
+
+  <div class="panel" id="panel-commands" role="tabpanel" hidden>
+    <main id="cmds"></main>
+    <p class="empty" id="empty-commands" hidden>No commands match that search.</p>
+  </div>
+
+  <div class="panel" id="panel-studio" role="tabpanel" hidden>
+    <main id="studio-list"></main>
+    <p class="empty" id="empty-studio" hidden>No Studio commands match that search.</p>
+  </div>
+
+  <div class="panel" id="panel-sounds" role="tabpanel" hidden>
+    <div class="snd-intro">
+      <h2>Every sound effect, all <span id="snd-total"></span> of them</h2>
+      <p>Press play to hear one. Like it? Copy its name and ask for it: &ldquo;use chime on that line.&rdquo; You never have to pick, though. The engine chooses a fresh one for every moment on its own.</p>
+    </div>
+    <div class="snd-bar">
+      <div class="snd-frow"><span class="snd-flabel" id="snd-jobs-l">What&rsquo;s it for?</span><div class="snd-chips" id="snd-jobs" role="group" aria-labelledby="snd-jobs-l"></div></div>
+      <div class="snd-frow"><span class="snd-flabel" id="snd-moods-l">How should it feel?</span><div class="snd-chips" id="snd-moods" role="group" aria-labelledby="snd-moods-l"></div></div>
+      <div class="snd-status"><span id="snd-count" aria-live="polite"></span><button type="button" class="snd-clear" id="snd-clear" hidden>Clear filters</button></div>
+    </div>
+    <p class="snd-callout" id="snd-note" role="status" hidden>Sounds can&rsquo;t play in this preview window. Ask Claude to &ldquo;open the library in my browser&rdquo; and they will.</p>
+    <p class="snd-callout" id="snd-somber" hidden>Somber reels get no sound effects unless you ask for one by name. The quiet is the point.</p>
+    <div id="snd-list"></div>
+    <div class="empty" id="empty-sounds" hidden>No sound matches that. <button type="button" class="snd-clear" id="snd-empty-clear">Clear filters</button></div>
+    <p class="snd-own">Want your own sounds in here? Drop the files into your sounds folder, or make a CapCut project of your favorites and say &ldquo;study my CapCut draft called my sound palette.&rdquo; Yours win every time.</p>
+  </div>
+
+  <div class="panel" id="panel-concepts" role="tabpanel" hidden>
+    <div class="concept-grid" id="concept-list"></div>
+    <p class="empty" id="empty-concepts" hidden>Nothing matches that search.</p>
+  </div>
+
+  <footer>
+    <div>Live effect previews run on <b>GSAP</b>, the engine's motion runtime. Footage, grade, and transition tiles use a stand-in scene. Sound and cover tiles are described, since they are audio and stills.</div>
+    <div>Motion and baked animation come standard on the <b>rendered routes</b> (medium, well-done, Animation). A color grade is optional: ask for one by name (cinematic, warm, cool, film, mono) and it goes on the footage only, never the graphics. On the editable CapCut route all of it stays yours to set in CapCut.</div>
+  </footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script>
+(function(){
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // ============ shared: copy + toast ============
+  var toast=document.getElementById("toast"), toastT;
+  function showToast(m){ toast.textContent=m; toast.classList.add("show"); clearTimeout(toastT); toastT=setTimeout(function(){toast.classList.remove("show");},1500); }
+  var isMac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
+  // the async Clipboard API is unavailable or rejects on file:// in several browsers, and this page
+  // is opened straight off disk. execCommand still works there, so it is the fallback, and we only
+  // say "copied" when a write actually reported success.
+  function legacyCopy(t){
+    var ta = document.createElement("textarea");
+    ta.value = t;
+    ta.setAttribute("readonly","");
+    ta.style.position="fixed"; ta.style.top="0"; ta.style.left="-9999px"; ta.style.opacity="0";
+    document.body.appendChild(ta);
+    var sel = document.getSelection();
+    var prev = (sel && sel.rangeCount) ? sel.getRangeAt(0) : null;
+    ta.select();
+    try { ta.setSelectionRange(0, t.length); } catch(e){}
+    var ok = false;
+    try { ok = document.execCommand("copy"); } catch(e){ ok = false; }
+    document.body.removeChild(ta);
+    if (prev && sel) { sel.removeAllRanges(); sel.addRange(prev); }
+    return ok;
+  }
+  function copyText(t){
+    var win = function(){ showToast("copied  " + t); };
+    var lose = function(){ showToast((isMac ? "\u2318C" : "Ctrl+C") + " to copy  " + t); };
+    var fallback = function(){ if (legacyCopy(t)) { win(); } else { lose(); } };
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(t).then(win, fallback);
+      } else { fallback(); }
+    } catch(e){ fallback(); }
+  }
+
+  // ============ EFFECTS TAB ============
+  var CATS=[
+    {key:"text",label:"Text motion",token:"--c-text",note:"How words arrive on screen. Hooks, takeovers, captions, cards."},
+    {key:"captions",label:"Caption styles",token:"--c-cap",note:"How your spoken words look on screen. These bake onto your video. Want other looks? CapCut does its own captions too, and you can layer accent ones as overlays. Your call."},
+    {key:"footage",label:"Footage motion",token:"--c-footage",note:"Camera moves on your clips. The difference between a slideshow and a film."},
+    {key:"trans",label:"Transitions",token:"--c-trans",note:"How one shot or scene hands off to the next."},
+    {key:"card",label:"Cards & data",token:"--c-card",note:"Animated graphics for teaching reels: numbers, lists, comparisons."},
+    {key:"grade",label:"Color & grade",token:"--c-grade",note:"Optional looks for the footage. Never on by default: ask for one by name, and it stays off your graphics. Tap to see before and after."},
+    {key:"sound",label:"Sound",token:"--c-sound",note:"What you hear. The full sound pool is listed under these: search it, tap a name to copy it, press play to hear it."},
+    {key:"cover",label:"Covers",token:"--c-cover",note:"The grid frame and its title."}
+  ];
+  var FMT={yap:"Yap",vo:"Voiceover",anim:"Animation",broll:"B-Roll"};
+  // every ENABLED sound cue, grouped by MOOD: [stem, seconds, path, job, description]. Generated from creative-vault/sfx/sfx-index.json.
+  var SFX_POOL={"somber": [["impact-bass-1", 2.12, "../.claude/skills/media-use/audio/assets/sfx/impact-bass-1.mp3", "emphasis", "Bass impact hit — logo/hero snap, headline slam. Trigger on the visual landing; decay carries into the next shot (J-cut)."], ["impact-bass-2", 2.59, "../.claude/skills/media-use/audio/assets/sfx/impact-bass-2.mp3", "emphasis", "Bass impact with a short swell — brief anticipation then a deep hit. Place so the peak lands on the reveal."], ["whoosh-cinematic", 5.54, "../.claude/skills/media-use/audio/assets/sfx/whoosh-cinematic.mp3", "transition", "Cinematic whoosh build (~5.5s) — sweeping scene transition. Align so the swell peaks on the cut."]], "tender": [["bell", 1.3, "creative-vault/sfx/cc0/bell.mp3", "notify", "A bell ring: a message or a small win."], ["bell-short", 0.53, "creative-vault/sfx/cc0/bell-short.mp3", "notify", "A short bell."], ["chime", 2.5, "../.claude/skills/media-use/audio/assets/sfx/chime.mp3", "notify", "Soft melodic chime — gentle positive beat: success/confirmation or a lighthearted transition. Sync to the visual moment."], ["cinematic-notification", 0.94, "creative-vault/sfx/cc0/cinematic-notification.mp3", "notify", "Cinematic notification: a warmer, longer ping with a soft tail."], ["mouse-click", 0.37, "../.claude/skills/media-use/audio/assets/sfx/click-soft.mp3", "click", "Mouse click: a quiet, short computer-mouse click. Sync exactly to the on-screen click."], ["ping", 1.32, "../.claude/skills/media-use/audio/assets/sfx/ping.mp3", "notify", "Sharp electronic ping — punchy accent on a key reveal or data point. Sync to the beat."], ["retro-bell", 1.78, "creative-vault/sfx/cc0/retro-bell.mp3", "notify", "A retro bell: a long, old-fashioned ring."], ["studio-notification", 0.47, "creative-vault/sfx/cc0/studio-notification.mp3", "notify", "Studio notification: a short, gentle ping for a message or a new piece of information."]], "tense": [["creaky-door", 2.04, "creative-vault/sfx/cc0/creaky-door.mp3", "transition", "A creaky door. Only when a door is on screen."], ["error", 1.62, "../.claude/skills/media-use/audio/assets/sfx/error.mp3", "error", "Negative / error tone — failure state, a 'wrong' beat, or a glitchy interruption."], ["glitch-3", 3.1, "../.claude/skills/media-use/audio/assets/sfx/glitch-3.mp3", "transition", "Low-key glitch texture — subtle digital shift, minimal transition that sits under other audio."]], "triumphant": [["coin-drops", 1.41, "creative-vault/sfx/cc0/coin-drops.mp3", "money", "Coins dropping."], ["coin-in-cup", 0.31, "creative-vault/sfx/cc0/coin-in-cup.mp3", "money", "A coin dropped into a cup."], ["correct-tone", 0.4, "creative-vault/sfx/cc0/correct-tone.mp3", "notify", "A correct-answer tone: the beat where something turns out right."], ["riser", 10.03, "../.claude/skills/media-use/audio/assets/sfx/riser.mp3", "build", "Long cinematic riser (~10s build, peak at the end). Trigger at (climax_time − 10.03s) so it crests exactly on the reveal."]], "playful": [["comedic-pop", 0.5, "creative-vault/sfx/cc0/comedic-pop.mp3", "reveal", "A comedic pop: a playful, cartoon-style pop as something appears."], ["notification", 2.46, "../.claude/skills/media-use/audio/assets/sfx/notification.mp3", "notify", "Notification chime — alert, message-in, toast/badge appears. Sync to the element entering."], ["plink", 0.23, "creative-vault/sfx/cc0/plink.mp3", "reveal", "A bright little plink as something appears."], ["plop-2", 0.3, "creative-vault/sfx/cc0/plop-2.mp3", "reveal", "A second soft plop."], ["pop-1", 0.36, "creative-vault/sfx/cc0/pop-1.mp3", "reveal", "A pop as something appears."], ["whoosh", 0.57, "../.claude/skills/media-use/audio/assets/sfx/whoosh.mp3", "transition", "Punchy whoosh/impact — fast reveal or hard transition accent. Sync to the motion."], ["whoosh-short", 0.57, "../.claude/skills/media-use/audio/assets/sfx/whoosh-short.mp3", "transition", "Short whoosh — quick swipe/slide accent, fast element move, snappy transition. Sync to the motion."]], "neutral": [["click-1", 0.36, "creative-vault/sfx/cc0/click-1.mp3", "click", "A click."], ["click-decision", 0.47, "creative-vault/sfx/cc0/click-decision.mp3", "click", "A decisive click, for making a choice."], ["dishes-clink-1", 0.61, "creative-vault/sfx/cc0/dishes-clink-1.mp3", "emphasis", "Dishes clinking. Kitchen b-roll, only when dishes are on screen."], ["dishes-clink-2", 0.73, "creative-vault/sfx/cc0/dishes-clink-2.mp3", "emphasis", "Dishes clinking, a second take. Only when dishes are on screen."], ["echo-click", 0.33, "creative-vault/sfx/cc0/echo-click.mp3", "click", "A click with a short echo."], ["hit-1", 0.41, "creative-vault/sfx/cc0/hit-1.mp3", "emphasis", "A soft hit: an accent when something lands."], ["hit-2", 0.35, "creative-vault/sfx/cc0/hit-2.mp3", "emphasis", "A soft hit, a second take."], ["hit-3", 0.33, "creative-vault/sfx/cc0/hit-3.mp3", "emphasis", "A light hit for emphasis."], ["hit-tap-2", 0.3, "creative-vault/sfx/cc0/hit-tap-2.mp3", "emphasis", "A hit with a tap on top, lighter."], ["hit-tap-3", 0.2, "creative-vault/sfx/cc0/hit-tap-3.mp3", "emphasis", "A short hit and tap."], ["key-press", 0.4, "../.claude/skills/media-use/audio/assets/sfx/key-press.mp3", "typing", "Single key press — one keystroke / terminal-input beat. Short accent, sync to the typed character."], ["microwave-door", 0.75, "creative-vault/sfx/cc0/microwave-door.mp3", "transition", "A microwave door opening. Only when it is on screen."], ["paper-1", 0.42, "creative-vault/sfx/cc0/paper-1.mp3", "reveal", "Paper. Only when paper is on screen, or as a paper-style reveal."], ["paper-2", 0.55, "creative-vault/sfx/cc0/paper-2.mp3", "reveal", "Paper, a second take."], ["paper-3", 0.55, "creative-vault/sfx/cc0/paper-3.mp3", "reveal", "Paper, a third take."], ["paper-4", 0.61, "creative-vault/sfx/cc0/paper-4.mp3", "reveal", "Paper, a fourth take."], ["plastic-drop", 0.81, "creative-vault/sfx/cc0/plastic-drop.mp3", "emphasis", "Something plastic dropping: a landing accent."], ["plastic-drop-large", 0.44, "creative-vault/sfx/cc0/plastic-drop-large.mp3", "emphasis", "Something large and plastic dropping."], ["quick-wind", 0.41, "creative-vault/sfx/cc0/quick-wind.mp3", "transition", "A quick gust of wind between shots."], ["rattle", 0.51, "creative-vault/sfx/cc0/rattle.mp3", "emphasis", "A short rattle."], ["rubber-drop-heavy", 0.51, "creative-vault/sfx/cc0/rubber-drop-heavy.mp3", "emphasis", "Something heavy and rubbery dropping."], ["snap", 0.33, "creative-vault/sfx/cc0/snap.mp3", "emphasis", "A snap as something locks in."], ["soulful-click", 0.31, "creative-vault/sfx/cc0/soulful-click.mp3", "click", "A soulful click: a warm, rounded click."], ["studio-open", 0.33, "creative-vault/sfx/cc0/studio-open.mp3", "reveal", "Studio open: a small, precise pop as text or a card appears."], ["studio-snap", 0.2, "creative-vault/sfx/cc0/studio-snap.mp3", "emphasis", "Studio snap: a crisp, short lock-in as something lands in place."], ["studio-tap", 0.09, "creative-vault/sfx/cc0/studio-tap.mp3", "click", "Studio tap: one light tap, for a single click or press on screen."], ["tap-1", 0.3, "creative-vault/sfx/cc0/tap-1.mp3", "click", "A tap: one light touch on screen."], ["tap-2", 0.28, "creative-vault/sfx/cc0/tap-2.mp3", "click", "A tap, a second take."], ["tape-peel", 0.76, "creative-vault/sfx/cc0/tape-peel.mp3", "reveal", "Tape peeling. Only when tape or a sticky note is on screen."], ["thud", 0.41, "creative-vault/sfx/cc0/thud.mp3", "emphasis", "A thud: something lands with weight."], ["typing", 1.5, "../.claude/skills/media-use/audio/assets/sfx/typing.mp3", "typing", "Typing burst (~1.5s of keys) — keyboard / code typing reveal, text-being-typed beat. Start as the text begins typing."]]};
+  var TX={
+    "soft-blur-in":{g:"char",frm:{opacity:0,filter:"blur(8px)",y:6},to:{opacity:1,filter:"blur(0px)",y:0},dur:.5,ease:"power2.out",st:.03},
+    "per-character-rise":{g:"char",frm:{opacity:0,yPercent:70},to:{opacity:1,yPercent:0},dur:.5,ease:"back.out(1.7)",st:.03},
+    "typewriter":{g:"char",tw:true},
+    "bottom-up-letters":{g:"char",mask:true,frm:{yPercent:110},to:{yPercent:0},dur:.52,ease:"power3.out",st:.03},
+    "top-down-letters":{g:"char",mask:true,frm:{yPercent:-110},to:{yPercent:0},dur:.52,ease:"power3.out",st:.03},
+    "stagger-from-center":{g:"char",frm:{opacity:0,y:10,scale:.8},to:{opacity:1,y:0,scale:1},dur:.5,ease:"power2.out",st:.03,from:"center"},
+    "stagger-from-edges":{g:"char",frm:{opacity:0,y:10,scale:.8},to:{opacity:1,y:0,scale:1},dur:.5,ease:"power2.out",st:.03,from:"edges"},
+    "per-word-crossfade":{g:"word",frm:{opacity:0},to:{opacity:1},dur:.5,ease:"sine.inOut",st:.16},
+    "spring-scale-in":{g:"word",frm:{opacity:0,scale:.4},to:{opacity:1,scale:1},dur:.9,ease:"elastic.out(1,0.55)",st:.09},
+    "shared-axis-y":{g:"word",frm:{opacity:0,y:26},to:{opacity:1,y:0},dur:.5,ease:"power3.out",st:.07},
+    "blur-out-up":{g:"word",frm:{opacity:1,y:0,filter:"blur(0px)"},to:{opacity:0,y:-22,filter:"blur(6px)"},dur:.5,ease:"power2.in",st:.06,back:true},
+    "kinetic-center-build":{g:"word",frm:{opacity:0,scale:.5},to:{opacity:1,scale:1},dur:.6,ease:"back.out(1.4)",st:.08,from:"center"},
+    "short-slide-right":{g:"word",frm:{opacity:0,x:-20},to:{opacity:1,x:0},dur:.42,ease:"power2.out",st:.06},
+    "short-slide-down":{g:"word",frm:{opacity:0,y:-20},to:{opacity:1,y:0},dur:.42,ease:"power2.out",st:.06},
+    "depth-parallax-words":{g:"word",frm:{opacity:0,z:-220,y:26},to:{opacity:1,z:0,y:0},dur:.7,ease:"power2.out",st:.1},
+    "mask-reveal-up":{g:"line",mask:true,frm:{yPercent:110},to:{yPercent:0},dur:.6,ease:"power4.out",st:.14},
+    "line-by-line-slide":{g:"line",frm:{opacity:0,x:-40},to:{opacity:1,x:0},dur:.52,ease:"power3.out",st:.16},
+    "micro-scale-fade":{g:"el",frm:{opacity:0,scale:.98},to:{opacity:1,scale:1},dur:.5,ease:"power2.out"},
+    "shimmer-sweep":{g:"el",shim:true},
+    "fade-through":{g:"el",frm:{opacity:1},to:{opacity:0},dur:.26,ease:"power1.in",back:true},
+    "shared-axis-z":{g:"el",frm:{opacity:0,scale:.8},to:{opacity:1,scale:1},dur:.52,ease:"power3.out"},
+    "scale-down-fade":{g:"el",frm:{opacity:0,scale:1.18},to:{opacity:1,scale:1},dur:.56,ease:"power2.out"},
+    "focus-blur-resolve":{g:"el",frm:{opacity:0,filter:"blur(12px)",scale:1.04},to:{opacity:1,filter:"blur(0px)",scale:1},dur:.7,ease:"power2.out"},
+    "shared-axis-x":{g:"el",frm:{opacity:0,x:42},to:{opacity:1,x:0},dur:.52,ease:"power3.out"}
+  };
+  var TX_DESC={"soft-blur-in":"Letters resolve from a soft blur.","per-character-rise":"Each letter lifts into place.","typewriter":"Characters type on, one by one.","bottom-up-letters":"Letters slide up from a hidden baseline.","top-down-letters":"Letters drop in from above.","stagger-from-center":"Reveal spreads out from the middle.","stagger-from-edges":"Reveal closes in from both ends.","per-word-crossfade":"Words fade in with a gentle overlap.","spring-scale-in":"Words pop in with a springy overshoot.","shared-axis-y":"Words rise along the vertical axis.","blur-out-up":"Words blur and lift away (an exit).","kinetic-center-build":"Words assemble around center.","short-slide-right":"Words slide in a short distance.","short-slide-down":"Words drop a short distance in.","depth-parallax-words":"Words arrive at different depths.","mask-reveal-up":"Lines slide up from behind a mask.","line-by-line-slide":"Lines slide in one at a time.","micro-scale-fade":"A subtle scale and fade.","shimmer-sweep":"A band of light sweeps across.","fade-through":"Dips out and fades back through.","shared-axis-z":"Scales up through depth as it fades.","scale-down-fade":"Eases down from larger to rest.","focus-blur-resolve":"A heavy blur pulls into focus.","shared-axis-x":"Slides in along the horizontal axis."};
+  var TX_SAMPLE={"soft-blur-in":"into focus","per-character-rise":"letter by letter","typewriter":"typed live","bottom-up-letters":"from below","top-down-letters":"top down","stagger-from-center":"from center","stagger-from-edges":"from the edges","per-word-crossfade":"word by word","spring-scale-in":"with a bounce","shared-axis-y":"up the y axis","blur-out-up":"blurring away","kinetic-center-build":"built to center","short-slide-right":"slide right","short-slide-down":"slide down","depth-parallax-words":"layers of depth","mask-reveal-up":"revealed\nline by line","line-by-line-slide":"each line\nslides in","micro-scale-fade":"settle in","shimmer-sweep":"catch the light","fade-through":"fade through","shared-axis-z":"through depth","scale-down-fade":"ease to rest","focus-blur-resolve":"pull focus","shared-axis-x":"along the x axis"};
+
+  var ITEMS=[];
+  Object.keys(TX).forEach(function(id){ ITEMS.push({cat:"text",name:id,desc:TX_DESC[id],fmt:["yap","vo","anim","broll"]}); });
+  [
+    ["captions","karaoke","Words light up in time as they are spoken.",["yap","broll","vo"]],
+    ["captions","word-by-word","One word pops on at a time, big and centered.",["yap","broll","anim"]],
+    ["captions","full-screen-takeover","A giant phrase fills the whole frame.",["anim","yap","broll"]],
+    ["captions","bottom-pop","The classic bold caption with one keyword highlighted.",["yap","vo","broll"]],
+    ["captions","two-line-stack","Two bold lines stack in, centered.",["yap","broll","vo"]],
+    ["footage","ken-burns-in","A slow push in on a held shot. The cinematic default.",["vo","yap","broll"]],
+    ["footage","ken-burns-out","A slow pull back, opening up the frame.",["vo","yap","broll"]],
+    ["footage","punch-in","A hard zoom cut for emphasis on a beat.",["yap","broll"]],
+    ["footage","slow-pan","A gentle drift across the frame.",["vo","broll"]],
+    ["footage","reframe-move","A smooth reframe: zoom and reposition together.",["yap","vo"]],
+    ["trans","hard-cut","A clean instant cut. No blend.",["yap","vo","anim","broll"]],
+    ["trans","crossfade","One shot dissolves into the next.",["vo","anim"]],
+    ["trans","zoom-through","Push through the frame into the next scene.",["anim","yap"]],
+    ["trans","whip-pan","A fast blurred swipe hands off the frame.",["anim","yap"]],
+    ["trans","rack-focus-blur","One scene blurs out as the next pulls into focus.",["anim","vo"]],
+    ["trans","waterfall-cut","The next scene wipes down over the last.",["anim"]],
+    ["card","stat-countup","A number counts up to its value.",["yap","anim"]],
+    ["card","comparison-split","Two sides slide in to compare.",["yap","anim"]],
+    ["card","ranked-list","A ranked list builds row by row.",["yap","anim"]],
+    ["card","checklist","Items tick on one at a time.",["yap","anim"]],
+    ["card","ticker-takeover","A phrase sweeps across like a ticker.",["anim","yap"]],
+    ["card","titlecard-reveal","A title and rule reveal together.",["anim","yap"]],
+    ["grade","cinematic","Ask by name. Richer contrast, teal-and-amber depth. Footage only.",["vo","broll","yap"]],
+    ["grade","warm","Ask by name. A sunlit, nostalgic warmth. Footage only.",["vo","broll","yap"]],
+    ["grade","cool","Ask by name. A calm, moody cool cast. Footage only.",["vo","broll","yap"]],
+    ["grade","film","Ask by name. Soft contrast, lifted blacks, a little less color. Footage only.",["vo","broll","yap"]],
+    ["grade","mono","Ask by name. Stripped to black and white. Footage only.",["vo","broll","yap"]],
+    ["sound","matched-sfx","A sound cue trimmed to match each move. Over 50 sounds ship with the engine, sorted by mood, so a repeated beat never has to reuse the same file twice. The pool below lists the ones switched on.","🔊",["yap","anim","broll"]],
+    ["sound","music-bed","A quiet bed under the voice.","🎵",["yap","vo","anim","broll"]],
+    ["sound","voiceover-carve","The music tucks under your voice for a clean mix.","🎚️",["vo","anim"]],
+    ["sound","ducking","The bed dips when you speak.","📉",["vo","yap"]],
+    ["cover","cover-frame","The best frame from your footage, picked by expression.","🖼️",["yap","vo","broll"]],
+    ["cover","cover-title","A title placed on the cover, above or over the head.","🏷️",["yap","vo","broll"]]
+  ].forEach(function(r){ if(r[0]==="sound"||r[0]==="cover") ITEMS.push({cat:r[0],name:r[1],desc:r[2],icon:r[3],fmt:r[4]}); else ITEMS.push({cat:r[0],name:r[1],desc:r[2],fmt:r[3]}); });
+
+  function scene(v){
+    var sky=v==="b"?["#bfe3ff","#8fb8e8","#5f6f9e"]:["#ffd39b","#ff9e7d","#c96f8f"];
+    var sun=v==="b"?"#eaf4ff":"#fff2c9", h1=v==="b"?"#4a5a80":"#7a5a6e", h2=v==="b"?"#2f3a55":"#4a3550";
+    return '<div class="scene"><svg viewBox="0 0 300 200" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="sk'+v+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+sky[0]+'"/><stop offset=".55" stop-color="'+sky[1]+'"/><stop offset="1" stop-color="'+sky[2]+'"/></linearGradient></defs><rect width="300" height="200" fill="url(#sk'+v+')"/><circle cx="150" cy="118" r="44" fill="'+sun+'" opacity=".92"/><path d="M0 150 Q75 122 150 148 T300 140 V200 H0Z" fill="'+h1+'" opacity=".9"/><path d="M0 172 Q90 152 180 170 T300 166 V200 H0Z" fill="'+h2+'"/></svg></div>';
+  }
+  function clr(el){ while(el.firstChild) el.removeChild(el.firstChild); }
+  function splitChars(el,t,mask){ clr(el); var u=[]; Array.from(t).forEach(function(c){ if(c===" "){el.appendChild(document.createTextNode(" "));return;} if(mask){var m=document.createElement("span");m.className="mask";var s=document.createElement("span");s.className="u";s.textContent=c;m.appendChild(s);el.appendChild(m);u.push(s);}else{var s2=document.createElement("span");s2.className="u";s2.textContent=c;el.appendChild(s2);u.push(s2);}}); return u; }
+  function splitWords(el,t){ clr(el); var u=[],ws=t.split(" "); ws.forEach(function(w,i){var s=document.createElement("span");s.className="u";s.textContent=w;el.appendChild(s);u.push(s);if(i<ws.length-1)el.appendChild(document.createTextNode(" "));}); return u; }
+  function splitLines(el,t){ clr(el); var u=[]; t.split("\n").forEach(function(ln){var L=document.createElement("span");L.className="line";var inr=document.createElement("span");inr.className="inner";inr.textContent=ln;L.appendChild(inr);el.appendChild(L);u.push(inr);}); return u; }
+  function setPlain(el,t){ clr(el); el.appendChild(document.createTextNode(t.replace(/\n/g," "))); }
+  function textTL(el,id){
+    var e=TX[id],t=TX_SAMPLE[id];
+    if(e.tw){ var u=splitChars(el,t,false); var car=document.createElement("span");car.className="caret";el.appendChild(car); return gsap.timeline().set(u,{opacity:0}).set(car,{opacity:1}).to(u,{opacity:1,duration:.001,ease:"steps(1)",stagger:.046}).to(car,{opacity:0,duration:.24,ease:"steps(1)",repeat:5,yoyo:true},">"); }
+    if(e.shim){ setPlain(el,t); el.classList.add("shim"); return gsap.timeline({onComplete:function(){el.classList.remove("shim");}}).fromTo(el,{backgroundPositionX:"140%"},{backgroundPositionX:"-40%",duration:1.15,ease:"power2.inOut"}); }
+    var targets,stg=e.st;
+    if(e.g==="char") targets=splitChars(el,t,e.mask); else if(e.g==="word") targets=splitWords(el,t); else if(e.g==="line") targets=splitLines(el,t); else{ setPlain(el,t); targets=el; stg=0; }
+    var stagger=stg?(e.from?{each:stg,from:e.from}:stg):0, tl=gsap.timeline();
+    tl.fromTo(targets,e.frm,Object.assign({},e.to,{duration:e.dur,ease:e.ease,stagger:stagger}));
+    if(e.back) tl.to(targets,{opacity:1,y:0,scale:1,filter:"blur(0px)",x:0,duration:.42,ease:"power2.out",stagger:stg?stg*0.6:0,delay:.35});
+    return tl;
+  }
+  function cvar(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim()||"#888"; }
+  function footageTL(el,id){
+    el.innerHTML=scene("a"); var s=el.querySelector(".scene"); gsap.set(s,{transformOrigin:"50% 50%"});
+    if(id==="ken-burns-in") return gsap.timeline().fromTo(s,{scale:1},{scale:1.16,duration:2.4,ease:"none"});
+    if(id==="ken-burns-out") return gsap.timeline().fromTo(s,{scale:1.16},{scale:1,duration:2.4,ease:"none"});
+    if(id==="punch-in") return gsap.timeline().fromTo(s,{scale:1},{scale:1.22,duration:.05,ease:"steps(1)"}).to(s,{scale:1.22,duration:1.2});
+    if(id==="slow-pan"){ gsap.set(s,{scale:1.2}); return gsap.timeline().fromTo(s,{xPercent:-8},{xPercent:8,duration:2.6,ease:"sine.inOut"}); }
+    return gsap.timeline().fromTo(s,{scale:1,xPercent:0},{scale:1.14,xPercent:-6,duration:2,ease:"power1.inOut"});
+  }
+  function transTL(el,id){
+    el.innerHTML='<div class="panelfx pB">'+scene("b")+'</div><div class="panelfx pA">'+scene("a")+'</div>';
+    var A=el.querySelector(".pA"),B=el.querySelector(".pB");
+    gsap.set(B,{autoAlpha:1}); gsap.set(A,{autoAlpha:1,x:0,scale:1,filter:"blur(0px)"}); var tl=gsap.timeline();
+    if(id==="hard-cut"){ tl.set(A,{autoAlpha:1}).set(A,{autoAlpha:0},"+=1.1"); }
+    else if(id==="crossfade"){ tl.to(A,{autoAlpha:0,duration:.9,ease:"sine.inOut"},.6); }
+    else if(id==="zoom-through"){ tl.set(B,{scale:.7,autoAlpha:0}).to(A,{scale:1.6,autoAlpha:0,duration:.7,ease:"power2.in"},.5).to(B,{scale:1,autoAlpha:1,duration:.7,ease:"power2.out"},.5); }
+    else if(id==="whip-pan"){ tl.to(A,{xPercent:-110,filter:"blur(10px)",duration:.34,ease:"power2.in"},.6).fromTo(B,{xPercent:110,filter:"blur(10px)"},{xPercent:0,filter:"blur(0px)",duration:.36,ease:"power2.out"},.78); }
+    else if(id==="rack-focus-blur"){ tl.set(B,{filter:"blur(14px)",autoAlpha:0}).to(A,{filter:"blur(14px)",autoAlpha:0,duration:.7,ease:"power2.in"},.5).to(B,{filter:"blur(0px)",autoAlpha:1,duration:.7,ease:"power2.out"},.6); }
+    else { tl.fromTo(A,{clipPath:"inset(0 0 0 0)"},{clipPath:"inset(100% 0 0 0)",duration:.7,ease:"power3.inOut"},.6); }
+    return tl;
+  }
+  function cardTL(el,id){
+    if(id==="stat-countup"){ el.innerHTML='<div style="text-align:center"><div class="fx-num" id="cn">0</div><div class="fx-lab">saved this month</div></div>'; var n=el.querySelector("#cn"),o={v:0}; return gsap.timeline().to(o,{v:1240,duration:1.4,ease:"power2.out",onUpdate:function(){n.textContent="$"+Math.round(o.v).toLocaleString();}}); }
+    if(id==="comparison-split"){ el.innerHTML='<div class="split"><div style="background:'+cvar("--c-card")+'" class="L">before</div><div style="background:'+cvar("--accent")+'" class="R">after</div></div>'; return gsap.timeline().fromTo(el.querySelector(".L"),{xPercent:-100},{xPercent:0,duration:.5,ease:"power3.out"}).fromTo(el.querySelector(".R"),{xPercent:100},{xPercent:0,duration:.5,ease:"power3.out"},"<"); }
+    if(id==="ranked-list"||id==="checklist"){ var chk=id==="checklist",rows=chk?["ship the reel","write the hook","hit post"]:["reach","saves","shares"]; el.innerHTML='<div class="rk">'+rows.map(function(r,i){return '<div class="row"><span class="n">'+(chk?"":(i+1))+'</span>'+r+(chk?'<span class="ck">✓</span>':'')+'</div>';}).join("")+'</div>'; return gsap.timeline().fromTo(el.querySelectorAll(".row"),{opacity:0,x:-24},{opacity:1,x:0,duration:.4,ease:"power3.out",stagger:.16}); }
+    if(id==="ticker-takeover"){ el.innerHTML='<div class="ticker" id="tk">income in the margins</div>'; return gsap.timeline().fromTo(el.querySelector("#tk"),{xPercent:60,opacity:0},{xPercent:0,opacity:1,duration:.5,ease:"power3.out"}).to(el.querySelector("#tk"),{xPercent:-60,opacity:0,duration:.6,ease:"power2.in"},"+=.5"); }
+    el.innerHTML='<div class="titlecard"><div class="t" id="tt">the real reason</div><div class="r" id="tr"></div></div>';
+    return gsap.timeline().fromTo(el.querySelector("#tt"),{opacity:0,y:18,filter:"blur(6px)"},{opacity:1,y:0,filter:"blur(0px)",duration:.6,ease:"power3.out"}).fromTo(el.querySelector("#tr"),{scaleX:0},{scaleX:1,duration:.4,ease:"power2.out"},"-=.15");
+  }
+  var GRADE={cinematic:"contrast(1.15) saturate(1.2) brightness(1.02)",warm:"sepia(.35) saturate(1.3) contrast(1.05) brightness(1.05)",cool:"saturate(.85) contrast(1.08) hue-rotate(-12deg) brightness(.98)",film:"contrast(1.22) saturate(.9) brightness(1.03)",mono:"grayscale(1) contrast(1.1)"};
+  function gradeTL(el,id){ el.innerHTML=scene("a")+'<div class="grade-tag" id="gt">before</div>'; var s=el.querySelector(".scene svg"),tag=el.querySelector("#gt"); gsap.set(s,{filter:"none"}); return gsap.timeline().to({},{duration:.7}).add(function(){tag.textContent="after";}).to(s,{filter:GRADE[id],duration:.8,ease:"power2.inOut"}); }
+  function captionTL(el,id){
+    if(id==="karaoke"){
+      var ws="make it make sense".split(" ");
+      el.innerHTML='<div class="cap-line">'+ws.map(function(w){return '<span class="w">'+w+'</span>';}).join(" ")+'</div>';
+      var sp=el.querySelectorAll(".w");
+      return gsap.timeline().fromTo(sp,{color:cvar("--muted")},{color:cvar("--accent"),duration:.26,stagger:.36,ease:"none"});
+    }
+    if(id==="word-by-word"){
+      el.innerHTML='<div class="cap-line" id="wbw" style="font-size:1.9rem"></div>';
+      var box=el.querySelector("#wbw"),seq=["one","word","at a","time"],tl=gsap.timeline();
+      seq.forEach(function(w){ tl.add(function(){box.textContent=w;}).fromTo(box,{opacity:0,scale:.6},{opacity:1,scale:1,duration:.26,ease:"back.out(1.6)"}).to({},{duration:.32}); });
+      return tl;
+    }
+    if(id==="full-screen-takeover"){
+      el.innerHTML='<div class="cap-take" id="tk">stop<br>scrolling</div>';
+      return gsap.timeline().fromTo(el.querySelector("#tk"),{opacity:0,scale:.5,filter:"blur(8px)"},{opacity:1,scale:1,filter:"blur(0px)",duration:.6,ease:"back.out(1.5)"});
+    }
+    if(id==="bottom-pop"){
+      var w2="save this for later".split(" ");
+      el.innerHTML='<div class="cap-bottom cap-line" style="font-size:1.15rem">'+w2.map(function(w,i){return '<span class="w'+(i===0?" cap-kw":"")+'">'+w+'</span>';}).join(" ")+'</div>';
+      var sp2=el.querySelectorAll(".w");
+      return gsap.timeline().fromTo(sp2,{opacity:0,y:9},{opacity:1,y:0,duration:.3,stagger:.15,ease:"power2.out"});
+    }
+    el.innerHTML='<div class="cap-line" style="font-size:1.5rem"><span class="cap-cl">the part</span><span class="cap-cl">nobody says</span></div>';
+    var cl=el.querySelectorAll(".cap-cl");
+    return gsap.timeline().fromTo(cl,{opacity:0,y:16},{opacity:1,y:0,duration:.44,stagger:.16,ease:"power3.out"});
+  }
+  function buildFx(card){
+    var st=card.querySelector(".stage"),id=card.dataset.name,cat=card.dataset.cat;
+    if(card._tl){card._tl.kill();} gsap.set(st,{clearProps:"filter"});
+    if(cat==="text"){ var t=st.querySelector(".stage-text"); gsap.set(t,{clearProps:"all"}); if(reduce){ setPlain(t,TX_SAMPLE[id]); card._tl=gsap.timeline().fromTo(t,{opacity:0},{opacity:1,duration:.25}); return; } card._tl=textTL(t,id); card._tl.play(0); return; }
+    if(cat==="captions"){ if(reduce){ st.innerHTML='<div class="cap-line" style="font-size:1.3rem">your captions</div>'; return; } card._tl=captionTL(st,id); card._tl.play(0); return; }
+    if(reduce) return;
+    if(cat==="footage") card._tl=footageTL(st,id); else if(cat==="trans") card._tl=transTL(st,id); else if(cat==="card") card._tl=cardTL(st,id); else if(cat==="grade") card._tl=gradeTL(st,id); else return;
+    card._tl.play(0);
+  }
+  var catsEl=document.getElementById("cats"), filtersEl=document.getElementById("filters");
+  var chipAll=document.createElement("button"); chipAll.className="chip"; chipAll.setAttribute("aria-pressed","true"); chipAll.dataset.scope="all"; chipAll.textContent="All "+ITEMS.length; filtersEl.appendChild(chipAll);
+  CATS.forEach(function(c){
+    var list=ITEMS.filter(function(it){return it.cat===c.key;}); if(!list.length) return;
+    var chip=document.createElement("button"); chip.className="chip"; chip.setAttribute("aria-pressed","false"); chip.dataset.scope=c.key; chip.innerHTML='<span class="dot" style="--d:var('+c.token+')"></span>'+c.label+" ("+list.length+")"; filtersEl.appendChild(chip);
+    var sec=document.createElement("section"); sec.dataset.scope=c.key;
+    var head=document.createElement("div"); head.className="sec-head"; head.innerHTML='<h2>'+c.label+'</h2><span class="count">'+list.length+'</span><span class="note">'+c.note+'</span>'; sec.appendChild(head);
+    var grid=document.createElement("div"); grid.className="grid";
+    list.forEach(function(it){
+      var card=document.createElement("div"); card.className="card"; card.dataset.name=it.name; card.dataset.cat=it.cat;
+      var stageInner=it.cat==="text"?'<div class="stage-text">'+(TX_SAMPLE[it.name]||it.name).replace(/\n/g,"<br>")+'</div>':(it.cat==="sound"||it.cat==="cover")?'<div class="note-ic">'+(it.icon||"◆")+'</div>':'';
+      var replay=(it.cat==="sound"||it.cat==="cover")?'':'<button class="replay">Replay ▸</button>';
+      var tags=it.fmt.map(function(f){return '<span class="tag">'+FMT[f]+'</span>';}).join("");
+      card.innerHTML='<div class="stage" role="button" tabindex="0" aria-label="Replay '+it.name+'">'+stageInner+'</div><div class="meta"><div class="name-row"><button class="eff-name" title="Tap to copy">'+it.name+'</button><span class="scope-dot" style="background:var('+c.token+')"></span></div><p class="desc">'+it.desc+'</p><div class="tags">'+tags+'</div>'+replay+'</div>';
+      grid.appendChild(card);
+    });
+    sec.appendChild(grid);
+    if(c.key==="sound"){ var jb=document.createElement("button"); jb.type="button"; jb.className="snd-jump"; jb.id="toSounds";
+      jb.innerHTML='<span class="snd-jump-l"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>Hear all <span id="snd-total-2"></span> sound effects</span><span aria-hidden="true">\u2192</span>';
+      sec.appendChild(jb); }
+    catsEl.appendChild(sec);
+  });
+  // ============ SOUNDS TAB ============
+  // Filter by what a sound is FOR (the question a creator actually has: "I need a pop on this word"),
+  // then by how it FEELS. Grouped by use, each with its real name, a big play button, and a copy button
+  // for the name to ask for. Data: SFX_POOL (generated by product/build-sfx-library.py).
+  var JOBS=[
+    ["emphasis","Pop on a word","Lands on the word that matters."],
+    ["transition","Whoosh between beats","Moves you from one moment to the next."],
+    ["reveal","Reveal","Something appears, opens or tears away."],
+    ["click","Click","A tap, a press, a pen, a button."],
+    ["notify","Ding","A message, a bell, a little alert."],
+    ["typing","Typing","Text typing onto the screen."],
+    ["build","Build-up","Rises into a big moment."],
+    ["error","Oops","Wrong answer, a glitch, a record scratch."],
+    ["money","Money","A number, a sale, a win you can count."],
+    ["other","Other","Everything else."]
+  ];
+  var MOODS=[
+    ["playful","Playful"],["triumphant","Triumphant"],["tender","Tender"],
+    ["tense","Tense"],["somber","Somber"],["neutral","Everyday"]
+  ];
+  var MOOD_NAME={}; MOODS.forEach(function(m){MOOD_NAME[m[0]]=m[1];});
+  var SOUNDS=[];
+  Object.keys(SFX_POOL).forEach(function(mood){ SFX_POOL[mood].forEach(function(it){
+    var d=String(it[4]||"").replace(/\(\d+\)/g,"").replace(/\s+/g," ").trim();
+    if(!d) d=it[0].replace(/[-_]+/g," ");
+    d=d.charAt(0).toUpperCase()+d.slice(1);
+    SOUNDS.push({stem:it[0], secs:it[1], src:it[2], job:it[3]||"other", title:d, mood:mood,
+                 hay:(it[0]+" "+d+" "+mood+" "+(MOOD_NAME[mood]||"")+" "+(it[3]||"")).toLowerCase()});
+  });});
+  JOBS.forEach(function(j){ j.push(SOUNDS.filter(function(s){return s.job===j[0];}).length); });
+  JOBS=JOBS.filter(function(j){return j[3]>0;});
+  JOBS.forEach(function(j){ j.pop(); });
+
+  var ICON_PLAY='<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.6-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z" fill="currentColor"/></svg>';
+  var ICON_PAUSE='<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><rect x="6.5" y="5" width="4" height="14" rx="1.2" fill="currentColor"/><rect x="13.5" y="5" width="4" height="14" rx="1.2" fill="currentColor"/></svg>';
+  var ICON_COPY='<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>';
+
+  var sndPanel=document.getElementById("panel-sounds");
+  var jobEl=document.getElementById("snd-jobs"), moodEl=document.getElementById("snd-moods");
+  var sndList=document.getElementById("snd-list"), sndCount=document.getElementById("snd-count");
+  var sndClear=document.getElementById("snd-clear"), sndNote=document.getElementById("snd-note");
+  var sndSomber=document.getElementById("snd-somber"), sndEmpty=document.getElementById("empty-sounds");
+  var fJob="", fMood="", sndQ="";
+  document.getElementById("snd-total").textContent=SOUNDS.length;
+  document.getElementById("snd-total-2").textContent=SOUNDS.length;
+
+  function chip(el, key, label, dot){
+    var b=document.createElement("button"); b.type="button"; b.className="chip snd-chip"; b.dataset.key=key;
+    b.setAttribute("aria-pressed", key===""?"true":"false");
+    b.innerHTML=(dot?'<span class="dot" style="--d:var(--mood-'+key+')"></span>':'')+'<span class="lbl">'+label+'</span><span class="n"></span>';
+    el.appendChild(b); return b;
+  }
+  chip(jobEl,"","All"); JOBS.forEach(function(j){ chip(jobEl,j[0],j[1]); });
+  chip(moodEl,"","Any"); MOODS.forEach(function(m){ if(SFX_POOL[m[0]]) chip(moodEl,m[0],m[1],true); });
+
+  function passes(s, job, mood){
+    return (!job||s.job===job) && (!mood||s.mood===mood) && (!sndQ||s.hay.indexOf(sndQ)>=0);
+  }
+  function setPressed(el, key){ el.querySelectorAll(".snd-chip").forEach(function(b){ var on=b.dataset.key===key; b.setAttribute("aria-pressed", on?"true":"false");
+    if(on && el.scrollWidth>el.clientWidth) b.scrollIntoView({block:"nearest", inline:"nearest"}); }); }
+
+  // one player for the whole tab: starting a sound stops the last one
+  var audio=new Audio(), playingBtn=null, raf=0;
+  function stopUI(){ if(playingBtn){ playingBtn.innerHTML=ICON_PLAY; playingBtn.setAttribute("aria-pressed","false");
+      playingBtn.setAttribute("aria-label","Play "+playingBtn.dataset.title); var r=playingBtn.closest(".snd-row"); r.classList.remove("is-playing"); r.style.setProperty("--p","0"); }
+    playingBtn=null; cancelAnimationFrame(raf); }
+  function tick(){ if(!playingBtn) return; var r=playingBtn.closest(".snd-row"); var p=audio.duration?audio.currentTime/audio.duration:0;
+    r.style.setProperty("--p", String(Math.min(1,p))); raf=requestAnimationFrame(tick); }
+  audio.addEventListener("ended", stopUI);
+  function toggle(btn, s){
+    if(playingBtn===btn){ audio.pause(); stopUI(); return; }
+    audio.pause(); stopUI();
+    audio.src=s.src; playingBtn=btn;
+    btn.innerHTML=ICON_PAUSE; btn.setAttribute("aria-pressed","true"); btn.setAttribute("aria-label","Pause "+s.title);
+    btn.closest(".snd-row").classList.add("is-playing");
+    audio.play().then(function(){ sndNote.hidden=true; tick(); })
+      .catch(function(e){ console.error("play failed", s.src, e); stopUI();
+        // almost always the page opened as a preview snapshot, cut off from the folder the sounds live in
+        sndNote.hidden=false; });
+  }
+
+  function row(s){
+    var r=document.createElement("div"); r.className="snd-row";
+    var b=document.createElement("button"); b.type="button"; b.className="snd-play"; b.dataset.title=s.title;
+    b.setAttribute("aria-pressed","false"); b.setAttribute("aria-label","Play "+s.title); b.innerHTML=ICON_PLAY;
+    b.addEventListener("click",function(){ toggle(b,s); });
+    var t=document.createElement("div"); t.className="snd-text";
+    t.innerHTML='<div class="snd-title"></div><div class="snd-meta"><span class="dot" style="--d:var(--mood-'+s.mood+')"></span><span></span></div>';
+    t.querySelector(".snd-title").textContent=s.title;
+    t.querySelector(".snd-meta span:last-child").textContent=(MOOD_NAME[s.mood]||s.mood)+" · "+s.secs.toFixed(1)+"s";
+    var c=document.createElement("button"); c.type="button"; c.className="snd-copy"; c.title="Copy the name to ask for it";
+    c.setAttribute("aria-label","Copy the name "+s.stem);
+    c.innerHTML=ICON_COPY+'<span></span>'; c.querySelector("span").textContent=s.stem;
+    c.addEventListener("click",function(){ copyText(s.stem); });
+    r.appendChild(b); r.appendChild(t); r.appendChild(c); return r;
+  }
+
+  function renderSounds(){
+    audio.pause(); stopUI();
+    // live counts: each chip says how many you'd get if you tapped it, given the other filter
+    jobEl.querySelectorAll(".snd-chip").forEach(function(b){ var n=SOUNDS.filter(function(s){return passes(s,b.dataset.key,fMood);}).length;
+      b.querySelector(".n").textContent=n; b.disabled=(n===0 && b.dataset.key!==fJob); });
+    moodEl.querySelectorAll(".snd-chip").forEach(function(b){ var n=SOUNDS.filter(function(s){return passes(s,fJob,b.dataset.key);}).length;
+      b.querySelector(".n").textContent=n; b.disabled=(n===0 && b.dataset.key!==fMood); });
+    sndList.innerHTML=""; var shown=0;
+    JOBS.forEach(function(j){
+      var hits=SOUNDS.filter(function(s){return s.job===j[0] && passes(s,fJob,fMood);});
+      if(!hits.length) return; shown+=hits.length;
+      var g=document.createElement("section"); g.className="snd-group";
+      g.innerHTML='<div class="snd-ghead"><h3></h3><p></p><span class="n"></span></div><div class="snd-grid"></div>';
+      g.querySelector("h3").textContent=j[1]; g.querySelector("p").textContent=j[2]; g.querySelector(".n").textContent=hits.length;
+      var grid=g.querySelector(".snd-grid"); hits.forEach(function(s){ grid.appendChild(row(s)); });
+      sndList.appendChild(g);
+    });
+    sndCount.textContent= shown===SOUNDS.length ? "All "+shown+" sounds" : shown+" of "+SOUNDS.length+" sounds";
+    sndClear.hidden=!(fJob||fMood||sndQ);
+    sndSomber.hidden=(fMood!=="somber");
+    sndEmpty.hidden=shown>0;
+  }
+  jobEl.addEventListener("click",function(e){ var b=e.target.closest(".snd-chip"); if(!b||b.disabled) return; fJob=b.dataset.key; setPressed(jobEl,fJob); renderSounds(); });
+  moodEl.addEventListener("click",function(e){ var b=e.target.closest(".snd-chip"); if(!b||b.disabled) return; fMood=b.dataset.key; setPressed(moodEl,fMood); renderSounds(); });
+  function clearSounds(){ fJob=""; fMood=""; setPressed(jobEl,""); setPressed(moodEl,"");
+    if(sndQ){ sndQ=""; curQ=""; var si=document.getElementById("search"); if(si) si.value=""; } renderSounds(); }
+  sndClear.addEventListener("click",clearSounds);
+  document.getElementById("snd-empty-clear").addEventListener("click",clearSounds);
+  document.getElementById("toSounds").addEventListener("click",function(){ switchTab("sounds"); window.scrollTo({top:0,behavior:reduce?"auto":"smooth"}); });
+  renderSounds();
+
+  var ss=document.createElement("style"); ss.textContent=".stage-text.shim{background:linear-gradient(100deg,var(--muted) 0%,var(--muted) 38%,var(--text) 50%,var(--muted) 62%,var(--muted) 100%);background-size:220% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;}"; document.head.appendChild(ss);
+  document.querySelectorAll("#panel-effects .card").forEach(function(card){
+    var cat=card.dataset.cat, playable=(cat!=="sound"&&cat!=="cover"), st=card.querySelector(".stage");
+    if(playable){ st.addEventListener("click",function(){buildFx(card);}); st.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();buildFx(card);}}); }
+    var rp=card.querySelector(".replay"); if(rp) rp.addEventListener("click",function(){buildFx(card);});
+    card.querySelector(".eff-name").addEventListener("click",function(){copyText(card.dataset.name);});
+  });
+  var curScope="all";
+  filtersEl.addEventListener("click",function(e){ var ch=e.target.closest(".chip"); if(!ch) return; Array.prototype.forEach.call(filtersEl.children,function(c){c.setAttribute("aria-pressed",c===ch?"true":"false");}); curScope=ch.dataset.scope; applySearch(); });
+  document.getElementById("playAll").addEventListener("click",function(){ var cards=Array.prototype.filter.call(document.querySelectorAll("#panel-effects .card"),function(c){return !c.hidden && !c.closest("section").hidden && c.dataset.cat!=="sound" && c.dataset.cat!=="cover";}); cards.forEach(function(c,i){ setTimeout(function(){buildFx(c);},i*70); }); });
+
+  // ============ COMMANDS TAB ============
+  var CMD=[
+    {group:"Steer this reel",gs:"Fix one thing, right now, on this reel. Say it in the chat.",items:[
+      ["make the hook bigger","Resize the hook text."],
+      ["move the captions up","Nudge the captions higher."],
+      ["redo that caption","Rewrite or fix a caption line."],
+      ["put a zoom on that line","Add a punch-in on that beat."],
+      ["swap that sound","Change a sound effect."],
+      ["that's not my voice, try again","Rewrite the copy to sound like you."]
+    ]},
+    {group:"Dress it up or down",gs:"Turn the whole look richer or leaner. It comes dressed by default; this steers it.",items:[
+      ["dress it up","More effects and motion."],
+      ["add more effects","A richer treatment."],
+      ["more movement","Add push-ins and motion."],
+      ["keep it clean","Pull the graphics back."],
+      ["strip it back","Minimal, bare treatment."]
+    ]},
+    {group:"Make it stick (train it)",gs:"Turn a one-time tweak into your permanent default. Claude saves it and tells you.",items:[
+      ["remember this","Save the last change as your default."],
+      ["make this my default","Same. Keep it on every reel."],
+      ["learn my pattern for the next reel","Save your whole set of tweaks."],
+      ["always do it this way","Save it as a forever rule."],
+      ["from now on…","Start any rule you want kept."],
+      ["/learn list","See everything you have taught it."],
+      ["/learn forget 2","Drop one you changed your mind about."],
+      ["learn this style, start incorporating it","Point it at a CapCut reel you love. Its text animations and sound level become your default."],
+      ["turn this into a prompt I can reuse","Get the recipe behind a reel you nailed, ready to paste next time."]
+    ]},
+    {group:"Save a look, fix a word",gs:"Bank a whole style, or teach it a spelling.",items:[
+      ["build my own style pack","Save your fonts and color as a named look."],
+      ["save this as my pack","Same, from the reel you just made."],
+      ["add that to my word list","Fix a caption spelling for good."]
+    ]},
+    {group:"Bring your own",gs:"Your fonts, your sounds, your named animations. All of it survives every update.",items:[
+      ["use my own font","Any font you own. Install it once, then just name it."],
+      ["add my own sounds","Drop .mp3 files in and they join the sound pool."],
+      ["call that one “the snap”","Name an animation you like and ask for it by name after that."],
+      ["what have I taught you?","The full list of your saved preferences."]
+    ]},
+    {group:"Start and get help",gs:"The everyday openers.",items:[
+      ["edit this reel","Run the full edit on your newest clip."],
+      ["make b-roll reels","Turn a folder of b-roll into posting-ready reels."],
+      ["show me what you can do","Open this library."],
+      ["my draft won't open, fix it","Self-heal a stuck CapCut draft."]
+    ]}
+  ];
+  var cmdsEl=document.getElementById("cmds");
+  CMD.forEach(function(g){
+    var wrap=document.createElement("div"); wrap.className="cmd-group";
+    wrap.innerHTML='<h2>'+g.group+'</h2><p class="gs">'+g.gs+'</p>';
+    var grid=document.createElement("div"); grid.className="cmd-grid";
+    g.items.forEach(function(it){
+      var c=document.createElement("div"); c.className="cmd"; c.dataset.phrase=it[0];
+      c.innerHTML='<div class="phrase">'+it[0]+'</div><div class="what">'+it[1]+'</div>';
+      c.addEventListener("click",function(){copyText(it[0]);});
+      grid.appendChild(c);
+    });
+    wrap.appendChild(grid); cmdsEl.appendChild(wrap);
+  });
+
+  // ============ STUDIO TAB ============
+  // Every /studio command in the Studio skill's menu gets a card here (the ship gate checks it).
+  // [what you see, what gets copied, what it does, what you get]
+  var STUDIO=[
+    {group:"Fix the look",gs:"Size, spacing, and color, held to one standard on every reel.",items:[
+      ["/studio font","/studio font","Text hierarchy and sizing. Your hook reads first, nothing runs off screen, captions are readable but never fight the moment.","Clean text that fills the line and breaks only where it should."],
+      ["/studio tidy caption","/studio tidy caption","Layout, spacing, placement. Holds the safe zone so text never sits on your face.","Everything in its right band, nothing crowding you or the edges."],
+      ["/studio accent","/studio accent","Color that actually reads over your footage, inside your style pack's palette.","Your one accent color popping cleanly against the video."],
+      ["/studio hush hook","/studio hush hook","Make one thing quieter. Smaller, calmer, fewer lines.","A smaller hook that takes fewer lines."],
+      ["/studio punch hook","/studio punch hook","Make one thing bolder. Bigger, more presence.","A bigger, bolder hook."]
+    ]},
+    {group:"Change one line's captions",gs:"Switch how a single line shows up. The rest of the reel stays as it is.",items:[
+      ["/studio single [line]","/studio single ","Show one caption line as single words, one at a time. Clean and simple.","That line reads word by word, popping on one at a time."],
+      ["/studio karaoke [line]","/studio karaoke ","The whole caption line sits on screen and each word lights up as you say it.","A word-by-word highlight that adds energy to that line."],
+      ["/studio takeover [line]","/studio takeover ","One word or phrase fills the whole screen for a beat.","A full-screen moment that lands your emphasis."]
+    ]},
+    {group:"Add personality",gs:"Tasteful touches that feel human. Studio proposes, you approve.",items:[
+      ["/studio vibe","/studio vibe","One tasteful personality touch that fits the moment. A real emoji, a doodle, a sparkle, a marker underline.","A single human touch on the beat that earns it. Never overdone."],
+      ["/studio ultra vibe","/studio ultra vibe","The maxed styling pass. Stacks as many designed touches as tastefully fit: hand-drawn marks, karaoke with the keyword lit, a full-screen takeover on the key beat, grain, and little motion moments. For medium, well-done, and hands-off (not raw).","A reel styled to its ceiling, handed to you as a full stack you can subtract from."],
+      ["/studio behind hook","/studio behind hook","Put your hook, or a gif, behind your head, so you pass in front of it.","That premium text-behind-you look, done for you."]
+    ]},
+    {group:"Borrow or build a style",gs:"Learn from reels you love, or design a pack of your own.",items:[
+      ["/studio inspo [link]","/studio inspo ","Send a reel you love. Studio watches it and hands you a checklist of the style pieces to borrow (the look, never the words).","A pick-list of fonts, delight touches, pacing, and color to pull into your own reel."],
+      ["/studio recipe","/studio recipe","Build a complete style pack. You bring your fonts, two colors, a vibe, and a name, and Studio designs it into a real pack you can use forever, on every finish.","A brand-new pack, ready to pick like any other."]
+    ]},
+    {group:"Finish and reset",gs:"The last look before export, and a clean slate whenever you want one.",items:[
+      ["/studio glow","/studio glow","The final look before you export. Catches the small misses.","A short, honest check of what's clean and what's left to do."],
+      ["/studio reset","/studio reset","Put everything back to the way it shipped, any time you want a fresh start.","The built-in packs and settings restored to the original. Your custom looks are kept."],
+      ["/studio document","/studio document","Refresh your Studio reference so it always matches everything your engine can do.","An up-to-date map of every command and style you have."]
+    ]}
+  ];
+  var studioEl=document.getElementById("studio-list");
+  var sIntro=document.createElement("div"); sIntro.className="studio-intro";
+  sIntro.innerHTML='<h2>Studio: fine-tune any reel</h2><p>Studio holds your reels to one standard, so you never coach the same fix twice. You still decide the creative direction. Type these in the chat, or tap one to copy it.</p><ul><li><span class="kbd">/studio</span> on its own shows the menu, so you can pick by feeling.</li><li><span class="kbd">/studio [command]</span> runs it on the whole reel.</li><li><span class="kbd">/studio [command] [element]</span> aims at one piece: your <b>hook</b>, <b>caption</b>, <b>takeover</b>, or <b>thought</b>. Like <span class="kbd">/studio hush hook</span>.</li><li>Resizing is never automatic. If the hook feels too big or too small, you say so.</li></ul>';
+  studioEl.appendChild(sIntro);
+  STUDIO.forEach(function(g){
+    var wrap=document.createElement("div"); wrap.className="cmd-group";
+    wrap.innerHTML='<h2>'+g.group+'</h2><p class="gs">'+g.gs+'</p>';
+    var grid=document.createElement("div"); grid.className="cmd-grid";
+    g.items.forEach(function(it){
+      var c=document.createElement("div"); c.className="cmd slash"; c.dataset.phrase=(it[0]+" "+it[2]+" "+it[3]).toLowerCase();
+      c.innerHTML='<div class="phrase">'+it[0]+'</div><div class="what">'+it[2]+'</div><div class="get"><b>You get</b>'+it[3]+'</div>';
+      c.addEventListener("click",function(){copyText(it[1]);});
+      grid.appendChild(c);
+    });
+    wrap.appendChild(grid); studioEl.appendChild(wrap);
+  });
+  var sNote=document.createElement("p"); sNote.className="studio-note";
+  sNote.innerHTML='<b>Works on every finish.</b> The well-done MP4 is pixel-exact. On the editable CapCut path, your read-along captions are CapCut\'s own Auto Captions, so there Studio gives you the exact placement to use. Coming soon: <b>flow</b>, for motion and animation feel.';
+  studioEl.appendChild(sNote);
+
+  // ============ CONCEPTS TAB ============
+  var CONCEPT=[
+    {h:"Build in layers",lede:"The order that saves you the most redo.",pts:["Cut, then look, then captions, then graphics, then sound.","Lock and love each layer before the next.","<b>Forward is cheap. Backward is expensive.</b>"]},
+    {h:"Teaching or confessional",lede:"Every reel is a contract. It decides your graphics.",pts:["<b>Teaching:</b> full graphics. Stat cards, lists, a summary.","<b>Confessional:</b> almost none. Hook, a held word, your face.","Never put a summary or a hopeful bow on a confessional. It breaks the spell.","Unsure? Confessional. Honesty travels furthest."]},
+    {h:"Order it like a steak",lede:"How finished you want it. One choice shapes the build.",pts:["<b>Raw:</b> an editable CapCut project you keep tweaking.","<b>Medium / well-done:</b> more baked, closer to done.","<b>Hands-off:</b> a finished video you just post.","Pick your doneness up front."]},
+    {h:"You direct, it does the work",lede:"It is an editor you steer, not a magic button.",pts:["Raw clip in, directed reel out.","Your first pass is about 70% there, on purpose.","Tweak or correct anything, anytime, in the chat.","Nothing is final until you say so."]},
+    {h:"The good stuff is automatic",lede:"You never have to ask for quality.",pts:["Movement, effects, and polish come standard, dressed to your register.","Want more? Say <b>dress it up</b>. Too much? Say <b>keep it clean</b>.","You steer the dial. You never build from zero."]},
+    {h:"It becomes your editor",lede:"Every reel needs fewer tweaks than the last.",pts:["Say <b>remember this</b> and a tweak becomes your default.","It only adds, never forgets your old preferences.","By reel twenty it comes back almost how you'd do it."]}
+  ];
+  var conEl=document.getElementById("concept-list");
+  CONCEPT.forEach(function(c){
+    var d=document.createElement("div"); d.className="concept"; d.dataset.text=(c.h+" "+c.lede+" "+c.pts.join(" ")).toLowerCase();
+    d.innerHTML='<h3>'+c.h+'</h3><p class="lede">'+c.lede+'</p><ul>'+c.pts.map(function(p){return '<li>'+p+'</li>';}).join("")+'</ul>';
+    conEl.appendChild(d);
+  });
+
+  // ============ tabs + search ============
+  var activeTab="effects";
+  function switchTab(t){
+    activeTab=t;
+    document.querySelectorAll(".tab").forEach(function(b){ b.setAttribute("aria-selected", b.dataset.tab===t?"true":"false"); });
+    ["effects","commands","studio","sounds","concepts"].forEach(function(p){ document.getElementById("panel-"+p).hidden = (p!==t); });
+    applySearch();
+  }
+  document.querySelector(".tabbar").addEventListener("click",function(e){ var b=e.target.closest(".tab"); if(b) switchTab(b.dataset.tab); });
+
+  var curQ="";
+  function applySearch(){
+    if(activeTab==="sounds"){ sndQ=curQ; renderSounds(); return; }
+    if(activeTab==="effects"){
+      var any=false;
+      document.querySelectorAll("#panel-effects section").forEach(function(s){
+        var scopeOk=curScope==="all"||s.dataset.scope===curScope, has=false;
+        s.querySelectorAll(".card").forEach(function(c){ var hit=scopeOk && (!curQ || (c.dataset.name+" "+c.querySelector(".desc").textContent).toLowerCase().indexOf(curQ)>=0); c.hidden=!hit; if(hit){has=true;any=true;} });
+        s.hidden=!has;
+      });
+      document.getElementById("empty-effects").hidden=any;
+    } else if(activeTab==="commands"){
+      var any2=false;
+      document.querySelectorAll("#panel-commands .cmd-group").forEach(function(g){
+        var has=false;
+        g.querySelectorAll(".cmd").forEach(function(c){ var hit=!curQ || (c.dataset.phrase+" "+c.querySelector(".what").textContent).toLowerCase().indexOf(curQ)>=0; c.hidden=!hit; if(hit){has=true;any2=true;} });
+        g.hidden=!has;
+      });
+      document.getElementById("empty-commands").hidden=any2;
+    } else if(activeTab==="studio"){
+      var any4=false;
+      document.querySelectorAll("#panel-studio .cmd-group").forEach(function(g){
+        var has=false;
+        g.querySelectorAll(".cmd").forEach(function(c){ var hit=!curQ || c.dataset.phrase.indexOf(curQ)>=0; c.hidden=!hit; if(hit){has=true;any4=true;} });
+        g.hidden=!has;
+      });
+      document.getElementById("empty-studio").hidden=any4;
+    } else {
+      var any3=false;
+      document.querySelectorAll("#panel-concepts .concept").forEach(function(c){ var hit=!curQ || c.dataset.text.indexOf(curQ)>=0; c.hidden=!hit; if(hit)any3=true; });
+      document.getElementById("empty-concepts").hidden=any3;
+    }
+  }
+  document.getElementById("search").addEventListener("input",function(e){ curQ=e.target.value.trim().toLowerCase(); applySearch(); });
+  // open a tab straight from the link: effects-library.html#studio
+  var hashTab=(location.hash||"").replace("#","");
+  if(["effects","commands","studio","sounds","concepts"].indexOf(hashTab)>=0) switchTab(hashTab);
+
+  // theme
+  var root=document.documentElement;
+  try{ var sv=localStorage.getItem("fx-theme"); if(sv) root.setAttribute("data-theme",sv); }catch(e){}
+  document.getElementById("themeToggle").addEventListener("click",function(){ var cur=root.getAttribute("data-theme"),dark=cur?cur==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches,nx=dark?"light":"dark"; root.setAttribute("data-theme",nx); try{localStorage.setItem("fx-theme",nx);}catch(e){} });
+
+  // autoplay effects on first view
+  if(!reduce && "IntersectionObserver" in window){
+    var io=new IntersectionObserver(function(ents){ ents.forEach(function(en){ var c=en.target; if(en.isIntersecting && !c._seen && c.dataset.cat!=="sound" && c.dataset.cat!=="cover"){ c._seen=true; setTimeout(function(){ if(!c.hidden && !c.closest("section").hidden) buildFx(c); },120); io.unobserve(c);} }); },{threshold:.35});
+    document.querySelectorAll("#panel-effects .card").forEach(function(c){io.observe(c);});
+  }
+})();
+</script>
+
+</body>
+</html>
