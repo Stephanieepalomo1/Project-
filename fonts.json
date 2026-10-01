@@ -1,0 +1,50 @@
+{
+  "_doc": "CREATIVE VAULT — FONTS. CapCut-available fonts + pairings the creator likes, mined from reference reels + your own. 'ship_safe_ofl' = Google/OFL, legal to include in the SOLD kit. 'capcut_available_verify_license' = usable in CapCut for YOUR own content but NOT license-cleared to ship (confirm before packaging). Hook font DEFAULT = Playfair Display (OFL), swapped from Advercase (custom import, non-ship). font_path patching lives in superyap.py / cleanyap.py. Grows as you add fonts.",
+
+  "hook_font_default": "Playfair Display (assets/fonts/PlayfairDisplay-VF.ttf) — OFL, ship-safe. Replaced Advercase (custom, cannot ship) 2026-07-30.",
+
+  "ship_safe_ofl": {
+    "Playfair Display": "hook/display serif — current DEFAULT hook",
+    "Poppins": "clean geometric sans — caption/body/takeover",
+    "Pinyon Script": "elegant formal script — feminine signature/hook",
+    "Julius Sans One": "thin elegant all-caps sans — airy hook",
+    "Shrikhand": "bold display serif — punchy hook",
+    "Cormorant": "elegant serif (installed) — feminine",
+    "Instrument Serif": "editorial serif (installed)"
+  },
+
+  "capcut_available_verify_license": {
+    "_note": "shown in @samgraciee CapCut font tutorials — free/usable inside CapCut, but verify redistribution license before shipping in the kit",
+    "Solid": "bold rounded display",
+    "Soup du Jour": "quirky retro display",
+    "Opera Cake": "retro rounded serif (very trendy)",
+    "Unipixel": "pixel / mono display",
+    "Letter": "cursive script (exact name unconfirmed from reel frame)",
+    "Sticker": "cut-out sticker / collage font",
+    "Ugly Dave": "her own handwritten accent (custom, non-ship)"
+  },
+
+  "pairings": [
+    {"pair": ["Pinyon Script", "Poppins"], "mood": "elegant + clean", "ship_safe": true, "source": "@samgraciee CapCut font combos 2026-07-30"},
+    {"pair": ["Julius Sans One", "Opera Cake"], "mood": "airy + retro", "ship_safe": "hook only (Opera Cake unverified)", "source": "@samgraciee"},
+    {"pair": ["Poppins", "Ugly Dave"], "mood": "clean + handwritten", "ship_safe": false, "source": "@samgraciee (Ugly Dave = her custom)"},
+    {"pair": ["Solid", "Soup du Jour"], "mood": "bold + playful", "ship_safe": "unverified", "source": "@samgraciee"},
+    {"pair": ["Advercase", "Coldia"], "mood": "cool minimalist", "ship_safe": false, "source": "premium pairing (Edits app)"},
+    {"pair": ["The Editorial Method", "Britti Sans"], "mood": "soft & relaxed", "ship_safe": false, "source": "premium pairing"},
+    {"pair": ["Thinker", "Deco"], "mood": "intentional & curious", "ship_safe": false, "source": "premium pairing"},
+    {"pair": ["Hopeless Romantic", "Nigelina"], "mood": "warm & romantic", "ship_safe": false, "source": "premium pairing"},
+    {"pair": ["Airone", "Sohne"], "mood": "bold & modern", "ship_safe": false, "source": "premium pairing (Sohne = Klim, expensive)"}
+  ],
+
+  "font_by_job": {
+    "hook_title": "distinctive display/serif — Playfair Display default (or Shrikhand / Pinyon Script / Julius Sans One)",
+    "caption_takeover": "clean legible sans — Poppins or Helvetica",
+    "accent_thought": "handwritten — Ugly Dave (her content) or a script"
+  },
+
+  "_licensing_reframe_2026-07-30": "Fonts in CapCut's IN-APP library (e.g. Prosecco, Opera Cake, Solid) are usable by ANY CapCut user including buyers — so packs MAY include them without us redistributing files. We only need an OFL/owned FILE for fonts the ENGINE auto-renders (font_path patch). Trick to get a CapCut-only font's file for the engine: type it once in a CapCut text + save → CapCut caches the .ttf and writes its resource_id into the draft; read the draft, copy the cached file, wire it (how ZY Modern was captured). Cache dir: ~/Movies/CapCut/User Data/Cache/effect|AITextTemplate/.",
+
+  "prosecco": "✅ CAPTURED 2026-07-30. Real family name = 'Prosecco and Baguette'. File → assets/fonts/Prosecco.ttf (+ CapCut Fonts dir). CapCut resource_id = 7527220957073640720. It's the FEMININE pack hook (Prosecco + Poppins body + Pinyon Script accent). Ship-safe path: buyers pick Prosecco in CapCut natively; engine auto-renders from the file.",
+
+  "todo": "Get Prosecco file via the cache trick → real Feminine pack. Source ship-safe OFL lookalikes for the premium @becoming.mahya moods. 4 @samgraciee SFX reels queued for sfx.json. Wire the approved packs into superyap.py/cleanyap.py as swappable font-pack configs."
+}
